@@ -1,6 +1,6 @@
 From: L. David Baron <dbaron@dbaron.org>
 
-Backout changeset c07445f34e92 (bug 611099) until bug 668163 is fixed.
+Backout changeset c07445f34e92 (bug 611099, part 1) until bug 668163 is fixed.
 
 diff --git a/layout/generic/nsLineLayout.cpp b/layout/generic/nsLineLayout.cpp
 --- a/layout/generic/nsLineLayout.cpp

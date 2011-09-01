@@ -1,6 +1,6 @@
 From: L. David Baron <dbaron@dbaron.org>
 
-Backout changeset 3af9fed4e33a (bug 611099) until bug 668163 is fixed.
+Backout changeset 3af9fed4e33a (bug 611099, part 3) until bug 668163 is fixed.
 
 diff --git a/layout/base/nsLayoutUtils.cpp b/layout/base/nsLayoutUtils.cpp
 --- a/layout/base/nsLayoutUtils.cpp
