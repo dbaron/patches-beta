@@ -1,0 +1,103 @@
+From: L. David Baron <dbaron@dbaron.org>
+
+Backout changeset 3af9fed4e33a (bug 611099) until bug 668163 is fixed.
+
+diff --git a/layout/base/nsLayoutUtils.cpp b/layout/base/nsLayoutUtils.cpp
+--- a/layout/base/nsLayoutUtils.cpp
++++ b/layout/base/nsLayoutUtils.cpp
+@@ -2580,36 +2580,36 @@ nsLayoutUtils::ComputeSizeWithIntrinsicD
+   // Resolve percentage intrinsic width/height as necessary:
+ 
+   NS_ASSERTION(aCBSize.width != NS_UNCONSTRAINEDSIZE,
+                "Our containing block must not have unconstrained width!");
+ 
+   PRBool hasIntrinsicWidth, hasIntrinsicHeight;
+   nscoord intrinsicWidth, intrinsicHeight;
+ 
+-  if (aIntrinsicSize.width.GetUnit() == eStyleUnit_Coord) {
++  if (aIntrinsicSize.width.GetUnit() == eStyleUnit_Coord ||
++      aIntrinsicSize.width.GetUnit() == eStyleUnit_Percent) {
+     hasIntrinsicWidth = PR_TRUE;
+-    intrinsicWidth = aIntrinsicSize.width.GetCoordValue();
+-    if (intrinsicWidth < 0)
+-      intrinsicWidth = 0;
++    intrinsicWidth = nsLayoutUtils::ComputeWidthValue(aRenderingContext,
++                           aFrame, aCBSize.width, 0, boxSizingAdjust.width +
++                           boxSizingToMarginEdgeWidth, aIntrinsicSize.width);
+   } else {
+-    NS_ASSERTION(aIntrinsicSize.width.GetUnit() == eStyleUnit_None,
+-                 "unexpected unit");
+     hasIntrinsicWidth = PR_FALSE;
+     intrinsicWidth = 0;
+   }
+ 
+-  if (aIntrinsicSize.height.GetUnit() == eStyleUnit_Coord) {
++  if (aIntrinsicSize.height.GetUnit() == eStyleUnit_Coord ||
++      (aIntrinsicSize.height.GetUnit() == eStyleUnit_Percent &&
++       aCBSize.height != NS_AUTOHEIGHT)) {
+     hasIntrinsicHeight = PR_TRUE;
+-    intrinsicHeight = aIntrinsicSize.height.GetCoordValue();
++    intrinsicHeight = nsLayoutUtils::
++      ComputeHeightDependentValue(aCBSize.height, aIntrinsicSize.height);
+     if (intrinsicHeight < 0)
+       intrinsicHeight = 0;
+   } else {
+-    NS_ASSERTION(aIntrinsicSize.height.GetUnit() == eStyleUnit_None,
+-                 "unexpected unit");
+     hasIntrinsicHeight = PR_FALSE;
+     intrinsicHeight = 0;
+   }
+ 
+   NS_ASSERTION(aIntrinsicRatio.width >= 0 && aIntrinsicRatio.height >= 0,
+                "Intrinsic ratio has a negative component!");
+ 
+   // Now calculate the used values for width and height:
+diff --git a/layout/generic/nsHTMLReflowState.cpp b/layout/generic/nsHTMLReflowState.cpp
+--- a/layout/generic/nsHTMLReflowState.cpp
++++ b/layout/generic/nsHTMLReflowState.cpp
+@@ -400,17 +400,19 @@ nsHTMLReflowState::InitResizeFlags(nsPre
+     (mStylePosition->MinHeightDependsOnContainer() &&
+      // FIXME: condition this on not-abspos?
+      mStylePosition->mMinHeight.GetUnit() != eStyleUnit_Auto) ||
+     (mStylePosition->MaxHeightDependsOnContainer() &&
+      // FIXME: condition this on not-abspos?
+      mStylePosition->mMaxHeight.GetUnit() != eStyleUnit_Auto) ||
+     mStylePosition->OffsetHasPercent(NS_SIDE_TOP) ||
+     mStylePosition->mOffset.GetBottomUnit() != eStyleUnit_Auto ||
+-    frame->IsBoxFrame();
++    frame->IsBoxFrame() ||
++    (mStylePosition->mHeight.GetUnit() == eStyleUnit_Auto &&
++     frame->GetIntrinsicSize().height.GetUnit() == eStyleUnit_Percent);
+ 
+   if (mStyleText->mLineHeight.GetUnit() == eStyleUnit_Enumerated) {
+     NS_ASSERTION(mStyleText->mLineHeight.GetIntValue() ==
+                  NS_STYLE_LINE_HEIGHT_BLOCK_HEIGHT,
+                  "bad line-height value");
+ 
+     // line-height depends on block height
+     frame->AddStateBits(NS_FRAME_CONTAINS_RELATIVE_HEIGHT);
+diff --git a/layout/generic/nsIFrame.h b/layout/generic/nsIFrame.h
+--- a/layout/generic/nsIFrame.h
++++ b/layout/generic/nsIFrame.h
+@@ -1547,19 +1547,20 @@ public:
+       , hPctPadding(0.0f), hPctMargin(0.0f)
+     {}
+   };
+   virtual IntrinsicWidthOffsetData
+     IntrinsicWidthOffsets(nsRenderingContext* aRenderingContext) = 0;
+ 
+   /*
+    * For replaced elements only. Gets the intrinsic dimensions of this element.
+-   * The dimensions may only be one of the following two types:
++   * The dimensions may only be one of the following three types:
+    *
+    *   eStyleUnit_Coord   - a length in app units
++   *   eStyleUnit_Percent - a percentage of the available space
+    *   eStyleUnit_None    - the element has no intrinsic size in this dimension
+    */
+   struct IntrinsicSize {
+     nsStyleCoord width, height;
+ 
+     IntrinsicSize()
+       : width(eStyleUnit_None), height(eStyleUnit_None)
+     {}
