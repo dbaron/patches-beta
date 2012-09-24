@@ -1,0 +1,40 @@
+# HG changeset patch
+# User L. David Baron <dbaron@dbaron.org>
+# Date 1347993434 25200
+# Node ID 4ed40d7a622b7e9ab08d98a7ca4be775f19e0857
+# Parent  28b930feb615aa3080f35011e12f907ca2737008
+Bug 774169, patch 1:  Make the property_database.js-based tests call getComputedStyle() for all properties that are expected to have longhand behavior.  r=bzbarsky  approval-mozilla-aurora=tests
+
+This currently only affects the testing of overflow, but it will also
+affect -moz-transform (and any other aliases implemented the same way)
+after the later patches in this bug.
+
+This special-cases text-decoration because text-decoration: inherit causes
+the color to inherit in a way that we can't serialize the result (since
+it's no longer "foreground").  (This isn't great; we might want to
+consider fixing it somehow.)
+
+diff --git a/layout/style/test/property_database.js b/layout/style/test/property_database.js
+--- a/layout/style/test/property_database.js
++++ b/layout/style/test/property_database.js
+@@ -3795,17 +3795,19 @@ function logical_box_prop_get_computed(c
+ 	return cs.getPropertyValue(property);
+ }
+ 
+ // Get the computed value for a property.  For shorthands, return the
+ // computed values of all the subproperties, delimited by " ; ".
+ function get_computed_value(cs, property)
+ {
+ 	var info = gCSSProperties[property];
+-	if ("subproperties" in info) {
++	if (info.type == CSS_TYPE_TRUE_SHORTHAND ||
++	    (info.type == CSS_TYPE_SHORTHAND_AND_LONGHAND &&
++	     property == "text-decoration")) {
+ 		var results = [];
+ 		for (var idx in info.subproperties) {
+ 			var subprop = info.subproperties[idx];
+ 			results.push(get_computed_value(cs, subprop));
+ 		}
+ 		return results.join(" ; ");
+ 	}
+ 	if (info.get_computed)
