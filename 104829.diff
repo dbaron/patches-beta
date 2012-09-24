@@ -3,7 +3,7 @@
 # Date 1347993434 25200
 # Node ID 4ed40d7a622b7e9ab08d98a7ca4be775f19e0857
 # Parent  28b930feb615aa3080f35011e12f907ca2737008
-Bug 774169, patch 1:  Make the property_database.js-based tests call getComputedStyle() for all properties that are expected to have longhand behavior.  r=bzbarsky  approval-mozilla-aurora=tests
+Bug 774169, patch 1:  Make the property_database.js-based tests call getComputedStyle() for all properties that are expected to have longhand behavior.  r=bzbarsky  approval-mozilla-beta=tests
 
 This currently only affects the testing of overflow, but it will also
 affect -moz-transform (and any other aliases implemented the same way)

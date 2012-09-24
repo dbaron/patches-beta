@@ -3,7 +3,7 @@
 # Date 1347993434 25200
 # Node ID 280ad553beed7bc8ace94a17f6baedc2b374509b
 # Parent  4ed40d7a622b7e9ab08d98a7ca4be775f19e0857
-Bug 774169, patch 2:  Add property_database.js entries for property aliases.  r=bzbarsky  approval-mozilla-aurora=tests
+Bug 774169, patch 2:  Add property_database.js entries for property aliases.  r=bzbarsky  approval-mozilla-beta=tests
 
 This adds entries for property aliases as though they are shorthands.
 This fits with the CSS working group's recent resolution to describe

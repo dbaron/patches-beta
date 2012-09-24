@@ -3,7 +3,7 @@
 # Date 1347993434 25200
 # Node ID a5d0425bd4551c7161ee5c5f16de88b378ca90bf
 # Parent  280ad553beed7bc8ace94a17f6baedc2b374509b
-Bug 774169, patch 3:  Treat -moz-transform as a shorthand rather than an alias so the parsing function can know whether it is parsing a prefixed transform.  r=bzbarsky  approval-mozilla-aurora=akeybl
+Bug 774169, patch 3:  Treat -moz-transform as a shorthand rather than an alias so the parsing function can know whether it is parsing a prefixed transform.  r=bzbarsky  approval-mozilla-beta=akeybl
 
 diff --git a/layout/style/Declaration.cpp b/layout/style/Declaration.cpp
 --- a/layout/style/Declaration.cpp

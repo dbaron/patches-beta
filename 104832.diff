@@ -3,7 +3,7 @@
 # Date 1347993434 25200
 # Node ID a0a2d2b4510c5d4d19a94cc3e4cc5f7711b6b11e
 # Parent  a5d0425bd4551c7161ee5c5f16de88b378ca90bf
-Bug 774169, patch 4:  Revert bug 719054 for prefixed -moz-transform but leave it for unprefixed transform.  r=bzbarsky  approval-mozilla-aurora=akeybl
+Bug 774169, patch 4:  Revert bug 719054 for prefixed -moz-transform but leave it for unprefixed transform.  r=bzbarsky  approval-mozilla-beta=akeybl
 
 diff --git a/layout/style/nsCSSParser.cpp b/layout/style/nsCSSParser.cpp
 --- a/layout/style/nsCSSParser.cpp
