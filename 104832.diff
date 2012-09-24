@@ -2,7 +2,7 @@
 # User L. David Baron <dbaron@dbaron.org>
 # Date 1347993434 25200
 # Node ID a0a2d2b4510c5d4d19a94cc3e4cc5f7711b6b11e
-# Parent  a5d0425bd4551c7161ee5c5f16de88b378ca90bf
+# Parent bfa037b4d51ef3f071a02df880a7fdd2a19f02a2
 Bug 774169, patch 4:  Revert bug 719054 for prefixed -moz-transform but leave it for unprefixed transform.  r=bzbarsky  approval-mozilla-beta=akeybl
 
 diff --git a/layout/style/nsCSSParser.cpp b/layout/style/nsCSSParser.cpp
@@ -188,7 +188,7 @@ diff --git a/layout/style/nsCSSParser.cpp b/layout/style/nsCSSParser.cpp
 diff --git a/layout/style/test/property_database.js b/layout/style/test/property_database.js
 --- a/layout/style/test/property_database.js
 +++ b/layout/style/test/property_database.js
-@@ -3809,53 +3809,58 @@ var gCSSProperties = {
+@@ -3809,51 +3809,56 @@ var gCSSProperties = {
  			"translate(3%, 5px)", "translate(5px, 3%)",
  			"matrix(1, 2, 3, 4, 5, 6)",
  			/* valid calc() values */
@@ -218,8 +218,6 @@ diff --git a/layout/style/test/property_database.js b/layout/style/test/property
 +			"matrix3d(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20%, 10%, 15, 16)",
  		] : []),
  		invalid_values: ["1px", "#0000ff", "red", "auto",
- 			"translatex(1)", "translatey(1)", "translate(2)",
- 			"translate(-3, -4)",
  			"translatex(1px 1px)", "translatex(translatex(1px))",
  			"translatex(#0000ff)", "translatex(red)", "translatey()",
  			"matrix(1px, 2px, 3px, 4px, 5px, 6px)", "scale(150%)",
@@ -234,7 +232,7 @@ diff --git a/layout/style/test/property_database.js b/layout/style/test/property
  			"translatex(-moz-max(5px,10%))",
  			"translate(10px, calc(min(5px,10%)))",
  			"translate(calc(max(5px,10%)), 10%)",
- 			"matrix(1, 0, 0, 1, max(5px * 3), calc(10% - 3px))"
+ 			"matrix(1, 0, 0, 1, -moz-max(5px * 3), calc(10% - 3px))"
  		].concat(SpecialPowers.getBoolPref("layout.3d-transforms.enabled") ? [
  			"perspective(0px)", "perspective(-10px)", "matrix3d(dinosaur)",
  			"matrix3d(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)",
