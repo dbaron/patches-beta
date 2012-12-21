@@ -1,6 +1,6 @@
 From: L. David Baron <dbaron@dbaron.org>
 
-Backout changesets 8f240265df77 and 1ead7ec99cea (bug 734569) to fix bug 810586.
+Backout changesets 8f240265df77 and 1ead7ec99cea (bug 734569) to fix bug 810586.  approval-mozilla-beta=bajaj
 
 diff --git a/layout/reftests/table-width/colspan-distribute-to-empty-1-ref.html b/layout/reftests/table-width/colspan-distribute-to-empty-1-ref.html
 deleted file mode 100644
