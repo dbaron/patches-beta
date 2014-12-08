@@ -1,0 +1,25 @@
+From: L. David Baron <dbaron@dbaron.org>
+Back out changeset a1bc385f0ad4 (Bug 1047928 patch 7) so that we don't ship it until we have the fix for bug 1089417, since the extra work we were doing was covering up bugs.
+
+diff --git a/layout/base/nsPresContext.cpp b/layout/base/nsPresContext.cpp
+--- a/layout/base/nsPresContext.cpp
++++ b/layout/base/nsPresContext.cpp
+@@ -2176,17 +2176,17 @@ nsPresContext::UserFontSetUpdated()
+   //      intrinsic widths, and any other parts of layout that depend on
+   //      font metrics.  This requires a style change reflow to update.
+   //
+   //   2. Changing the value of the 'ex' and 'ch' units in style data,
+   //      which also depend on font metrics.  Updating this information
+   //      requires rebuilding the rule tree from the top, avoiding the
+   //      reuse of cached data even when no style rules have changed.
+ 
+-  PostRebuildAllStyleDataEvent(NS_STYLE_HINT_REFLOW, eRestyle_ForceDescendants);
++  PostRebuildAllStyleDataEvent(NS_STYLE_HINT_REFLOW, eRestyle_Subtree);
+ }
+ 
+ FontFaceSet*
+ nsPresContext::Fonts()
+ {
+   if (!mFontFaceSet) {
+     mFontFaceSet = new FontFaceSet(mDocument->GetInnerWindow(), this);
+     GetUserFontSet();  // this will cause the user font set to be created/updated
