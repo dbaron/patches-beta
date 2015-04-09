@@ -1,0 +1,26 @@
+From: L. David Baron <dbaron@dbaron.org>
+
+Bug 1148829 - backport part of bug 1117603
+
+diff --git a/layout/style/nsTransitionManager.cpp b/layout/style/nsTransitionManager.cpp
+--- a/layout/style/nsTransitionManager.cpp
++++ b/layout/style/nsTransitionManager.cpp
+@@ -649,16 +649,18 @@ nsTransitionManager::WillRefresh(mozilla
+     // where it has been torn down; don't bother doing anything in
+     // this case.  But do get rid of all our transitions so we stop
+     // triggering refreshes.
+     RemoveAllElementCollections();
+     return;
+   }
+ 
+   FlushTransitions(Can_Throttle);
++
++  //CheckNeedsRefresh();
+ }
+ 
+ void
+ nsTransitionManager::FlushTransitions(FlushFlags aFlags)
+ {
+   if (PR_CLIST_IS_EMPTY(&mElementCollections)) {
+     // no transitions, leave early
+     return;

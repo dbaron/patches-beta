@@ -1,0 +1,34 @@
+From: L. David Baron <dbaron@dbaron.org>
+
+Bug 1148829 - Backport a safer version of part of bug 1061364 to make transitions stop running the refresh driver after they've finished.
+
+diff --git a/layout/style/AnimationCommon.cpp b/layout/style/AnimationCommon.cpp
+--- a/layout/style/AnimationCommon.cpp
++++ b/layout/style/AnimationCommon.cpp
+@@ -381,20 +381,22 @@ CommonAnimationManager::GetAnimationRule
+   // to both be refreshed by this point.
+   if (IsAnimationManager()) {
+     NS_WARN_IF_FALSE(!collection->mNeedsRefreshes ||
+                      collection->mStyleRuleRefreshTime ==
+                        mPresContext->RefreshDriver()->MostRecentRefresh(),
+                      "should already have refreshed style rule");
+   } else {
+     // FIXME: Remove this assignment.  See bug 1061364.
+-    collection->mNeedsRefreshes = true;
+-    collection->EnsureStyleRuleFor(
+-      mPresContext->RefreshDriver()->MostRecentRefresh(),
+-      EnsureStyleRule_IsNotThrottled);
++    TimeStamp now = mPresContext->RefreshDriver()->MostRecentRefresh();
++    if (collection->mStyleRuleRefreshTime.IsNull() ||
++        collection->mStyleRuleRefreshTime != now) {
++      collection->mNeedsRefreshes = true;
++    }
++    collection->EnsureStyleRuleFor(now, EnsureStyleRule_IsNotThrottled);
+   }
+ 
+   return collection->mStyleRule;
+ }
+ 
+ /* static */ const CommonAnimationManager::LayerAnimationRecord
+   CommonAnimationManager::sLayerAnimationInfo[] =
+     { { eCSSProperty_transform,
